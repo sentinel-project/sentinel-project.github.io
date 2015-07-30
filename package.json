@@ -1,17 +1,22 @@
 {
-    "name": "sentinel",
-    "version": "1.0.0",
-    "description": "",
-    "main": "index.js",
-    "author": "",
-    "license": "MIT",
-    "devDependencies": {
-        "browserify": "^11.0.0",
-        "http-server": "^0.8.0"
-    },
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "clean": "rm -rf dist && mkdir -p dist",
-        "build:scripts": "browserify -d -o dist/main.js assets/scripts/main.js"
-    }
+  "name": "sentinel",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "browserify": "^11.0.0",
+    "http-server": "^0.8.0"
+  },
+  "scripts": {
+    "clean": "rm -rf dist && mkdir -p dist",
+
+    "build": "npm run clean && npm run build:html && npm run build:scripts",
+    "build:html": "cp assets/index.html dist/main.html",
+    "build:scripts": "browserify -d -o dist/main.js assets/js/main.js"
+  },
+  "dependencies": {
+    "d3": "^3.5.6"
+  }
 }

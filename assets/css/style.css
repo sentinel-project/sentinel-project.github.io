@@ -1,23 +1,31 @@
-text {
-  fill: #333;
-  font-size: 12px; }
-
-.background {
+.stroke {
   fill: none;
-  pointer-events: all; }
-
-.unit {
-  cursor: pointer;
-  fill: #ccc;
   stroke: #000;
-  stroke-width: 0.4px; }
+  stroke-width: 3px;
+}
 
-.legend-bg {
+.fill {
   fill: #fff;
-  fill-opacity: 0.8; }
+}
 
-.legend-bar {
-  stroke: #333;
-  stroke-width: 1px; }
+.graticule {
+  fill: none;
+  stroke: #777;
+  stroke-width: .5px;
+  stroke-opacity: .5;
+}
 
-/*# sourceMappingURL=geomap.css.map */
+.land {
+  fill: #222;
+}
+
+.boundary {
+  fill: none;
+  stroke: #777;
+  stroke-width: .5px;
+}
+
+.countries path {
+  stroke: #777;
+  stroke-width: .5px;
+}

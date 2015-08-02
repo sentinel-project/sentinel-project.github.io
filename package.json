@@ -34,6 +34,7 @@
     "d3-geo-projection": "^0.2.15",
     "d3-geomap": "^1.0.1",
     "isoc": "0.0.1",
+    "jquery": "^2.1.4",
     "queue-async": "^1.0.7",
     "topojson": "^1.6.19",
     "underscore": "^1.8.3"

@@ -20,13 +20,6 @@ var projection = d3.geo.eckert4()
 var path = d3.geo.path().projection(projection);
 var graticule = d3.geo.graticule();
 
-var casesById = d3.map();
-
-var logize = d3.scale.log()
-    .base(2)
-    .nice()
-    .range(d3.range(9).map(function (i) { return "log-" + i; }));
-
 var svg = d3.select("#map").append("svg")
     .attr("width", width)
     .attr("height", height);
@@ -49,93 +42,48 @@ svg.append("path")
     .attr("class", "graticule")
     .attr("d", path);
 
-queue()
-    .defer(d3.json, "world-50m.json")
-    .defer(d3.csv, "crude_evaluation_targets.csv", function (d) {
-      casesById.set(ccToNum[d["Country code"]], +d["Estimated MDR-TB cases"]);
-      // casesById.set(ccToNum[d["Country code"]], +d["5-14 year olds needing preventive therapy"]);
-      // casesById.set(ccToNum[d["Country code"]], +d["0-4 year olds needing evaluation"]);
-    })
-    .await(drawMap);
-
 function drawMap(error, world) {
   if (error) throw error;
-
   console.log(world);
-
-  var quantize = d3.scale.quantize()
-      .domain([0, _(casesById.values()).max()])
-      .range(d3.range(9).map(function(i) { return "q" + i + "-9"; }));
 
   svg.append("g")
     .attr("class", "countries")
     .selectAll("path")
     .data(topojson.feature(world, world.objects.countries).features)
     .enter().append("path")
-    .attr("class", function(d) { return "country " + quantize(casesById.get(d.id)); })
+    .attr("class", "country")
+    .attr("data-country-id", function (d) { return d.id; })
+    .attr("id", function (d) { return "country-" + d.id; })
     .attr("d", path);
 
   svg.insert("path", ".graticule")
       .datum(topojson.mesh(world, world.objects.countries, function(a, b) { return a !== b; }))
       .attr("class", "boundary")
       .attr("d", path);
-
 }
 
-// d3.select(self.frameElement).style("height", height + "px");
+function updateMap(error, dataMap) {
+  var countries = svg.selectAll("path.country");
 
+  var quantize = d3.scale.quantize()
+      .domain([0, _(dataMap.values()).max()])
+      .range(d3.range(9).map(function(i) { return "q" + i + "-9"; }));
 
-var pubById = d3.map();
+  countries.attr("class", function (d) { return "country " + quantize(dataMap.get(d.id)); });
+}
 
-var svg2 = d3.select("#map2").append("svg")
-    .attr("width", width)
-    .attr("height", height);
-
-svg2.append("defs").append("path")
-    .datum({type: "Sphere"})
-    .attr("id", "sphere")
-    .attr("d", path);
-
-svg2.append("use")
-    .attr("class", "stroke")
-    .attr("xlink:href", "#sphere");
-
-svg2.append("use")
-    .attr("class", "fill")
-    .attr("xlink:href", "#sphere");
-
-svg2.append("path")
-    .datum(graticule)
-    .attr("class", "graticule")
-    .attr("d", path);
+function drawAndUpdateMap(error, world, data) {
+  var dataMap = d3.map();
+  _(data).each(function (d) {
+    dataMap.set(d.id, d.value)
+  });
+  drawMap(error, world);
+  updateMap(error, dataMap);
+}
 
 queue()
     .defer(d3.json, "world-50m.json")
-    .defer(d3.csv, "tb_publications.csv", function (d) {
-      pubById.set(ccToNum[d["Country code"]], +d["MDR publication category*"]);
+    .defer(d3.csv, "crude_evaluation_targets.csv", function (d) {
+      return {id: ccToNum[d["Country code"]], value: +d["Estimated MDR-TB cases"]}
     })
-    .await(drawMap2);
-
-function drawMap2(error, world) {
-  if (error) throw error;
-
-  console.log(world);
-
-  var quantize = d3.scale.quantize()
-      .domain([0, 4])
-      .range(d3.range(4).map(function (i) { return "q" + i + "-4"; }));
-
-  svg2.append("g")
-    .attr("class", "countries Purples")
-    .selectAll("path")
-    .data(topojson.feature(world, world.objects.countries).features)
-    .enter().append("path")
-    .attr("class", function(d) { return "country " + quantize(pubById.get(d.id)); })
-    .attr("d", path);
-
-  svg2.insert("path", ".graticule")
-      .datum(topojson.mesh(world, world.objects.countries, function(a, b) { return a !== b; }))
-      .attr("class", "boundary")
-      .attr("d", path);
-
-}
+    .await(drawAndUpdateMap);

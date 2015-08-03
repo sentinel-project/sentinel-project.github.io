@@ -16,6 +16,8 @@
   },
   "scripts": {
     "clean": "rm -rf dist && mkdir -p dist",
+    "build:data": "cp data/* dist/",
+    "watch:data": "watch 'npm run build:data' data/",
     "build:static": "cp assets/static/* dist/",
     "watch:static": "watch 'npm run build:static' assets/static/",
     "build:js": "browserify -o dist/main.js assets/js/main.js",
@@ -23,16 +25,15 @@
     "build:css": "cp -r assets/css dist/",
     "watch:css": "watch 'npm run build:css' assets/css/",
     "build": "npm run clean && npm run build:static && npm run build:css && npm run build:js",
-    "watch": "parallelshell 'npm run watch:js' 'npm run watch:css' 'npm run watch:static'",
+    "watch": "parallelshell 'npm run watch:js' 'npm run watch:css' 'npm run watch:static' 'npm run watch:data'",
     "serve": "http-server -p 9090 dist/",
     "live-reload": "live-reload --port 9091 dist/",
     "open:dev": "opener http://localhost:9090",
     "dev": "npm run clean && parallelshell 'npm run live-reload -s' 'npm run serve -s' 'npm run watch' 'npm run open:dev -s'"
   },
   "dependencies": {
+    "colorbrewer": "0.0.2",
     "d3": "^3.5.6",
-    "d3-geo-projection": "^0.2.15",
-    "d3-geomap": "^1.0.1",
     "isoc": "0.0.1",
     "jquery": "^2.1.4",
     "queue-async": "^1.0.7",

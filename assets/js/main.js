@@ -4,7 +4,8 @@ var _ = require("underscore");
 var colorbrewer = require("colorbrewer");
 
 var width = 1200,
-    height = 800;
+    height = 800,
+    quantiles = 9;
 
 var svg = d3.select("#world-map").select("svg")
     .attr("width", width)
@@ -12,9 +13,10 @@ var svg = d3.select("#world-map").select("svg")
 
 function updateMap(error, dataMap) {
   var scale = d3.scale.quantize()
-      .domain([0, Math.round(_(dataMap.values()).max() / 9) * 9]);
+      .domain([0,
+        Math.round(_(dataMap.values()).max() / quantiles) * quantiles]);
 
-  var colors = scale.range(colorbrewer.BuGn[9]);
+  var colors = scale.range(colorbrewer.BuGn[quantiles]);
   var legend = d3.select('#legend')
     .append('ul')
     .attr('class', 'list-inline');
@@ -31,7 +33,8 @@ function updateMap(error, dataMap) {
   var countries = svg.selectAll("path.land");
 
   var quantize = scale
-      .range(d3.range(9).map(function(i) { return "q" + i + "-9"; }));
+      .range(d3.range(quantiles).map(function(i) {
+        return "q" + i + "-" + quantiles; }));
 
   countries.attr("class", function () {
     if (dataMap.get(this.id) !== undefined) {

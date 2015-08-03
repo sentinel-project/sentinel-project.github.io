@@ -1,6 +1,13 @@
-#world-map .land {
+.land {
+  fill: #CCC;
+  fill-opacity: 1;
   stroke: #777;
   stroke-width: .5px;
+}
+
+.land:hover{
+  stroke: #666;
+  stroke-width: 1.5px;
 }
 
 .list-inline {

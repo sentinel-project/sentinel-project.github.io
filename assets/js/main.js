@@ -9,7 +9,7 @@ var margin = {top: 10, left: 10, bottom: 10, right: 10}
   , mapRatio = 651/1008
   , height = width * mapRatio;
 
-var quantiles = 9;
+var segments = 5;
 
 var svg = d3.select("#world-map").select("svg");
 
@@ -27,36 +27,45 @@ function resize() {
 }
 
 function updateMap(error, dataMap) {
-  var scale = d3.scale.quantize()
-      .domain([0,
-        Math.round(_(dataMap.values()).max() / quantiles) * quantiles]);
+    var scale = d3.scale.log().base(10);
+    console.log(scale.domain());
+    console.log(scale.range());
+    var colors = scale.copy().range(colorbrewer.Purples[segments]);
+    
+    var legend = d3.select('#legend')
+        .append('ul')
+        .attr('class', 'list-inline');
 
-  var colors = scale.range(colorbrewer.Purples[quantiles]);
-  var legend = d3.select('#legend')
-    .append('ul')
-    .attr('class', 'list-inline');
+    var keys = legend.selectAll('li.key').data(colors.range());
+    keys.enter().append('li')
+        .attr('class', 'key')
+        .style('border-top-color', String)
+        .text(function(d) {
+            var r = colors.invert(d);
+            return r[0];
+        });
 
-  var keys = legend.selectAll('li.key').data(colors.range());
-  keys.enter().append('li')
-      .attr('class', 'key')
-      .style('border-top-color', String)
-      .text(function(d) {
-        var r = colors.invertExtent(d);
-        return r[0];
-      });
+    var countries = svg.selectAll("path.land");
 
-  var countries = svg.selectAll("path.land");
+    // var quantize = scale
+    //   .range(d3.range(segments).map(function(i) {
+    //     return "q" + i + "-" + segments; }));
 
-  var quantize = scale
-      .range(d3.range(quantiles).map(function(i) {
-        return "q" + i + "-" + quantiles; }));
+    var colorClass = function (i) {
+        if (i === 0) {
+            return "q0-" + segments;
+        }
+        return "q" + Math.min(segments - 1, Math.floor(scale(i))) + "-" + segments;
+    }
 
-  countries.attr("class", function () {
+    countries.attr("class", function () {
     if (dataMap.get(this.id) !== undefined) {
-      return "land " + quantize(dataMap.get(this.id));
+      return "land " + colorClass(dataMap.get(this.id));
     } else {
       return "land no-data";
     }});
+
+    countries.attr("data-tb", function () { return dataMap.get(this.id) });
 }
 
 d3.csv("crude_evaluation_targets.csv", function (d) {

@@ -9,26 +9,86 @@ var margin = {top: 10, left: 10, bottom: 10, right: 10}
 , mapRatio = 651/1008
 , height = width * mapRatio;
 
-var segments = 5;
 var dataMap;
 
-// Set up map to display and resize correctly
-var svg = d3.select("#world-map").select("svg");
-svg.attr('width', width).attr('height', height);
-d3.select(window).on('resize', resize);
+// =======================
+// Chart defs
+// =======================
 
-
-function resize() {
-    // adjust things when the window size changes
-    width = parseInt(d3.select('#world-map').style('width'));
-    width = width - margin.left - margin.right;
-    height = width * mapRatio;
-
-    svg.attr('width', width).attr('height', height);
+var charts = {
+    "reported": {
+        "title": "Reported MDR-TB & XDR-TB Cases",
+        "ordinals": ["No Reported Cases", "Reported MDR-TB Case",
+                     "Reported XDR-TB Case", "Reported MDR-TB & XDR-TB"]
+    },
+    "pub_mdr": {
+        "title": "Publication Documenting MDR-TB Cases",
+        "ordinals": ["No Publication",
+                     "Publication with Adult MDR-TB",
+                     "Publication with Child MDR-TB",
+                     "Publication with Adult & Child MDR-TB"]
+    },
+    "pub_xdr": {
+        "title": "Publication Documenting XDR-TB Cases",
+        "ordinals": ["No Publication",
+                     "Publication with Adult XDR-TB",
+                     "Publication with Child XDR-TB",
+                     "Publication with Adult & Child XDR-TB"]
+    },
+    "all_mdr": {
+        "title": "All Data on MDR-TB",
+        "ordinals": ["No Reported Cases",
+                     "Reported Cases without Publication",
+                     "Reported Cases with Publications for Adults",
+                     "Reported Cases with Publications for Adults & Children"]
+    },
+    "all_xdr": {
+        "title": "All Data on XDR-TB",
+        "ordinals": ["No Reported Cases",
+                     "Reported Cases without Publication",
+                     "Reported Cases with Publications for Adults",
+                     "Reported Cases with Publications for Adults & Children"]
+    },
+    "estimated": {
+        "title": "Estimated MDR-TB Cases",
+        "scale": "log",
+        "segments": 5
+    },
+    "eval_0": {
+        "title": "0-4 Year Olds: Needing Evaluation",
+        "scale": "log",
+        "segments": 5
+    },
+    "eval_5": {
+        "title": "5-14 Year Olds: Needing Evaluation",
+        "scale": "log",
+        "segments": 5
+    },
+    "treat_0": {
+        "title": "0-4 Year Olds: Needing Treatment",
+        "scale": "log",
+        "segments": 5
+    },
+    "treat_5": {
+        "title": "5-14 Year Olds: Needing Treatment",
+        "scale": "log",
+        "segments": 5
+    },
+    "therapy_0": {
+        "title": "0-4 Year Olds: Needing Preventative Therapy",
+        "scale": "log",
+        "segments": 5
+    },
+    "therapy_5": {
+        "title": "5-14 Year Olds: Needing Preventative Therapy",
+        "scale": "log",
+        "segments": 5
+    }
 }
 
-
+// =======================
 // Load data from CSVs
+// =======================
 queue()
     .defer(d3.csv, "crude_evaluation_targets.csv", cleanEvalCSV)
     .defer(d3.csv, "tb_publications.csv", cleanPubCSV)
@@ -40,26 +100,29 @@ queue()
         pubs.forEach(function (d) {
             data[d.id] = _.extend(data[d.id], d.data);
         });
+        console.log(data);
         dataMap = d3.map(data);
+        updateMap("estimated");
     });
 
 
 function cleanEvalCSV(data) {
-    var dataFields = ["Estimated MDR-TB cases",
-                      "0-4 year olds needing evaluation",
-                      "5-14 year olds needing evaluation",
-                      "0-4 year olds needing treatment",
-                      "5-14 year olds needing treatment",
-                      "0-4 year olds needing preventive therapy",
-                      "5-14 year olds needing preventive therapy"]
+    var dataFields = {"Estimated MDR-TB cases": "estimated",
+                      "0-4 year olds needing evaluation": "eval_0",
+                      "5-14 year olds needing evaluation": "eval_5",
+                      "0-4 year olds needing treatment": "treat_0",
+                      "5-14 year olds needing treatment": "treat_5",
+                      "0-4 year olds needing preventive therapy": "therapy_0",
+                      "5-14 year olds needing preventive therapy": "therapy_5"}
 
-    var dataObj = {}
-    dataFields.forEach(function (field) {
-        dataObj[field] = +data[field]
+    var d = {}
+    _(dataFields).each(function (value, key) {
+      d[value] = +data[key]
     });
-    dataObj["Country"] = data["Country"]
+
+    d["country"] = data["Country"]
     return {id: data["Country code"],
-            data: dataObj}
+            data: d}
 }
 
 
@@ -75,26 +138,24 @@ function cleanPubCSV(data) {
         d[value] = +data[key]
     });
 
-    d["Reported Cases"] = d["reported_mdr"] + 2 * d["reported_xdr"];
-    d["Publication Documenting MDR-TB Cases"] = d["documented_adult_mdr"] +
-            2 * d["documented_child_mdr"];
-    d["Publication Documenting XDR-TB Cases"] = d["documented_adult_mdr"] +
-            2 * d["documented_child_xdr"];
+    d["reported"] = d["reported_mdr"] + 2 * d["reported_xdr"];
+    d["pub_mdr"] = d["documented_adult_mdr"] + 2 * d["documented_child_mdr"];
+    d["pub_xdr"] = d["documented_adult_mdr"] + 2 * d["documented_child_xdr"];
 
     if (d["documented_child_mdr"] === 1) {
-        d["All MDR-TB Data"] = 3;
+        d["all_mdr"] = 3;
     } else if (d["documented_adult_mdr"] === 1) {
-        d["All MDR-TB Data"] = 2;
+        d["all_mdr"] = 2;
     } else {
-        d["All MDR-TB Data"] = d["reported_mdr"];
+        d["all_mdr"] = d["reported_mdr"];
     }
 
     if (d["documented_child_xdr"] === 1) {
-        d["All XDR-TB Data"] = 3;
+        d["all_xdr"] = 3;
     } else if (d["documented_adult_xdr"] === 1) {
-        d["All XDR-TB Data"] = 2;
+        d["all_xdr"] = 2;
     } else {
-        d["All XDR-TB Data"] = d["reported_xdr"];
+        d["all_xdr"] = d["reported_xdr"];
     }
 
     return {id: data["Country code"],
@@ -102,28 +163,53 @@ function cleanPubCSV(data) {
 }
 
 
-function updateMap(error, dataMap) {
-    var scale = d3.scale.log().base(10);
-    var colors = scale.copy().range(colorbrewer.Purples[segments]);
+// =============================================
+// Set up map to display and resize correctly
+// =============================================
+var svg = d3.select("#world-map").select("svg");
+svg.attr('width', width).attr('height', height);
+d3.select(window).on('resize', resize);
 
-    var legend = d3.select('#legend')
-    .append('ul')
-    .attr('class', 'list-inline');
 
-    var keys = legend.selectAll('li.key').data(colors.range());
-    keys.enter().append('li')
-    .attr('class', 'key')
-    .style('border-top-color', String)
-    .text(function(d) {
-        var r = colors.invert(d);
-        return r[0];
-    });
+function resize() {
+    // adjust things when the window size changes
+    width = parseInt(d3.select('#world-map').style('width'));
+    width = width - margin.left - margin.right;
+    height = width * mapRatio;
+
+    svg.attr('width', width).attr('height', height);
+}
+
+
+// =================
+// Show initial map
+// =================
+
+function updateMap(mapId) {
+    var mapDef = charts[mapId];
+    var scale, segments;
+
+    if (mapDef.scale === "log") {
+        scale = d3.scale.log();
+        segments = mapDef.segments;
+    }
+    // TODO handle ordinals
+
+    d3.select("#map-title").text(mapDef.title);
+
+    var colors = colorbrewer.Purples[segments];
+
+    var legend = d3.select('#legend').append('ul').attr('class', 'list-inline');
+    var keys = legend.selectAll('li.key').data(colors);
+    keys.enter()
+        .append('li')
+        .attr('class', 'key')
+        .style('border-left-color', String)
+        .text(function (d) {
+            return d;
+        });
 
     var countries = svg.selectAll("path.land");
-
-    // var quantize = scale
-    //   .range(d3.range(segments).map(function(i) {
-    //     return "q" + i + "-" + segments; }));
 
     var colorClass = function (i) {
         if (i === 0) {
@@ -134,21 +220,9 @@ function updateMap(error, dataMap) {
 
     countries.attr("class", function () {
         if (dataMap.get(this.id) !== undefined) {
-            return "land " + colorClass(dataMap.get(this.id));
+            return "land " + colorClass(dataMap.get(this.id)[mapId]);
         } else {
             return "land no-data";
-        }});
-
-        countries.attr("data-tb", function () { return dataMap.get(this.id) });
-    }
-
-    d3.csv("crude_evaluation_targets.csv", function (d) {
-        return {id: d["Country code"], value: +d["Estimated MDR-TB cases"]}
-    }, function (error, data) {
-        var dataMap = d3.map();
-        _(data).each(function (d) {
-            dataMap.set(d.id, d.value)
-        });
-        console.log(dataMap);
-        updateMap(error, dataMap);
-    })
+        }
+    });
+}

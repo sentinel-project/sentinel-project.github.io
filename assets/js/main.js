@@ -9,6 +9,8 @@ var margin = {top: 10, left: 10, bottom: 10, right: 10}
 , mapRatio = 651/1008
 , height = width * mapRatio;
 
+var colorscheme = "BuGn";
+
 var dataMap;
 
 // =======================
@@ -102,7 +104,7 @@ queue()
         });
         console.log(data);
         dataMap = d3.map(data);
-        updateMap("estimated");
+        init();
     });
 
 
@@ -166,7 +168,9 @@ function cleanPubCSV(data) {
 // =============================================
 // Set up map to display and resize correctly
 // =============================================
-var svg = d3.select("#world-map").select("svg");
+var worldMap = d3.select("#world-map");
+worldMap.attr('class', colorscheme);
+var svg = worldMap.select("svg");
 svg.attr('width', width).attr('height', height);
 d3.select(window).on('resize', resize);
 
@@ -197,7 +201,7 @@ function updateMap(mapId) {
 
     d3.select("#map-title").text(mapDef.title);
 
-    var colors = colorbrewer.Purples[segments];
+    var colors = colorbrewer[colorscheme][segments];
 
     var legend = d3.select('#legend').append('ul').attr('class', 'list-inline');
     var keys = legend.selectAll('li.key').data(colors);
@@ -225,4 +229,15 @@ function updateMap(mapId) {
             return "land no-data";
         }
     });
+
+    countries.attr("data-hover", function () {
+        if (dataMap.get(this.id) !== undefined) {
+            return dataMap.get(this.id)[mapId];
+        }
+    })
+}
+
+function init() {
+    var initialMap = "treat_5";
+    updateMap(initialMap);
 }

@@ -8,36 +8,39 @@
   "license": "MIT",
   "devDependencies": {
     "browserify": "^11.0.0",
+    "ejs-on-command": "^1.0.0",
     "http-server": "^0.8.0",
     "live-reload": "^1.1.0",
     "opener": "latest",
     "parallelshell": "latest",
+    "uglify-js": "^2.4.24",
     "watch": "latest"
   },
   "scripts": {
     "clean": "rm -rf dist && mkdir -p dist",
+    "build:ejs:dev": "ejs-on-command -j dev.json -d dist/index.html assets/ejs/index.ejs",
+    "build:ejs:prod": "ejs-on-command -j prod.json -d dist/index.html assets/ejs/index.ejs",
+    "watch:ejs": "watch 'npm run build:ejs:dev' assets/ejs/",
     "build:data": "cp data/* dist/",
     "watch:data": "watch 'npm run build:data' data/",
     "build:static": "cp assets/static/* dist/",
     "watch:static": "watch 'npm run build:static' assets/static/",
-    "build:js": "browserify -o dist/main.js assets/js/main.js",
-    "watch:js": "watch 'npm run build:js' assets/js/",
+    "build:js:dev": "browserify -d -o dist/main.js assets/js/main.js",
+    "build:js:prod": "npm run build:js:dev && uglifyjs dist/main.js --compress --mangle -o dist/main.min.js",
+    "watch:js": "watch 'npm run build:js:dev' assets/js/",
     "build:css": "cp -r assets/css dist/",
     "watch:css": "watch 'npm run build:css' assets/css/",
-    "build": "npm run clean && npm run build:static && npm run build:css && npm run build:js",
-    "watch": "parallelshell 'npm run watch:js' 'npm run watch:css' 'npm run watch:static' 'npm run watch:data'",
+    "build": "npm run clean && npm run build:data && npm run build:static && npm run build:ejs:prod && npm run build:css && npm run build:js:prod",
+    "watch": "parallelshell 'npm run watch:ejs' 'npm run watch:js' 'npm run watch:css' 'npm run watch:static' 'npm run watch:data'",
     "serve": "http-server -p 9090 dist/",
     "live-reload": "live-reload --port 9091 dist/",
-    "open:dev": "opener http://localhost:9090",
-    "dev": "npm run clean && parallelshell 'npm run live-reload -s' 'npm run serve -s' 'npm run watch' 'npm run open:dev -s'"
+    "open": "opener http://localhost:9090",
+    "dev": "npm run clean && parallelshell 'npm run live-reload -s' 'npm run serve -s' 'npm run watch' 'npm run open -s'"
   },
   "dependencies": {
     "colorbrewer": "0.0.2",
     "d3": "^3.5.6",
-    "isoc": "0.0.1",
-    "jquery": "^2.1.4",
     "queue-async": "^1.0.7",
-    "topojson": "^1.6.19",
     "underscore": "^1.8.3"
   }
 }

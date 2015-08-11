@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Project Sentinel</title>
+
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+        <!-- Optional theme -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="css/style.css" media="screen" charset="utf-8">
+        <link rel="stylesheet" href="css/colorbrewer.css" media="screen" charset="utf-8">
+    </head>
+    <body>
+        <div class="container-fluid">
+            <div class="col-md-12">
+                <h1 id="map-title"></h1>
+                <div id="legend"></div>
+                <div id="world-map">
+                    <% include world %>
+                </div>
+            </div>
+        </div>
+
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+        <% if (dev) { %>
+            <script src="main.js"></script>
+        <% } else { %>
+            <script src="main.min.js"></script>
+        <% } %>
+        <% if (dev) { %>
+        <script src="//localhost:9091"></script>
+        <% } %>
+    </body>
+</html>

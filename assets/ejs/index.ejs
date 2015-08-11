@@ -1,37 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <title>Project Sentinel</title>
+<head>
+    <meta charset="utf-8">
+    <title>Project Sentinel</title>
 
-        <!-- Latest compiled and minified CSS -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-        <!-- Optional theme -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
-        <link rel="stylesheet" href="css/style.css" media="screen" charset="utf-8">
-        <link rel="stylesheet" href="css/colorbrewer.css" media="screen" charset="utf-8">
-    </head>
-    <body>
-        <div class="container-fluid">
-            <div class="col-md-12">
-                <h1 id="map-title"></h1>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="css/style.css" media="screen" charset="utf-8">
+    <link rel="stylesheet" href="css/colorbrewer.css" media="screen" charset="utf-8">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-12">
+                <h1>Data Visualizations for TB Across the Globe</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4 col-md-5">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#map-the-gap" data-toggle="tab">Map the Gap</a></li>
+                    <li><a href="#targets" data-toggle="tab">Targets</a></li>
+                    <li><a href="#members" data-toggle="tab">Project Members</a></li>
+                </ul>
+                <div class="tab-content map-list">
+                    <div role="tabpanel" class="tab-pane active" id="map-the-gap">
+                        <ul class="list-unstyled">
+                            <li>Reported Cases</li>
+                            <li>Publication Documenting MDR-TB Cases</li>
+                            <li>Publication Documenting XDR-TB Cases</li>
+                            <li>All MDR-TB Data</li>
+                            <li>All XDR-TB Data</li>
+                        </ul>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="targets">
+                        <ul class="list-unstyled">
+                            <li>Estimated MDR-TB Cases</li>
+                            <li>0-4 Year Olds: Needing Evaluation</li>
+                            <li>5-14 Year Olds: Needing Evaluation</li>
+                            <li>0-4 Year Olds: Needing Treatment</li>
+                            <li>5-14 Year Olds: Needing Treatment</li>
+                            <li>0-4 Year Olds: Needing Preventative Therapy</li>
+                            <li>5-14 Year Olds: Needing Preventative Therapy</li>
+                        </ul>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="members">
+                        <ul class="list-unstyled">
+                            <li>Sentinel Project Members</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8 col-md-7">
+                <h2 id="map-title"></h2>
                 <div id="legend"></div>
                 <div id="world-map">
                     <% include world %>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Latest compiled and minified JavaScript -->
-        <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-        <% if (dev) { %>
-            <script src="main.js"></script>
-        <% } else { %>
-            <script src="main.min.js"></script>
-        <% } %>
-        <% if (dev) { %>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <% if (dev) { %>
+        <script src="main.js"></script>
         <script src="//localhost:9091"></script>
-        <% } %>
-    </body>
+    <% } else { %>
+        <script src="main.min.js"></script>
+    <% } %>
+</body>
 </html>

@@ -18,6 +18,10 @@
   display: inline-block;
 }
 
+.map-list {
+    padding: 10px;
+}
+
 #legend {
     padding: 1.5em 0 0 1.5em;
 }

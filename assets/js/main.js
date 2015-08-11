@@ -2,6 +2,7 @@ var d3 = require('d3');
 var queue = require('queue-async');
 var _ = require("underscore");
 var colorbrewer = require("colorbrewer");
+var Backbone = require('backbone');
 
 var margin = {top: 10, left: 10, bottom: 10, right: 10}
 , width = parseInt(d3.select('#world-map').style('width'))
@@ -191,26 +192,34 @@ function resize() {
 
 function updateMap(mapId) {
     var mapDef = charts[mapId];
-    var scale, segments;
+    var svg = d3.select("#world-map").select("svg");
+    var scale, segments, legendData;
 
     if (mapDef.scale === "log") {
         scale = d3.scale.log();
         segments = mapDef.segments;
+        var colors = colorbrewer[colorscheme][segments];
+        legendData = _(colors).zip(colors);
+    } else {
+        segments = mapDef.ordinals.length;
+        scale = d3.scale.linear();
+
+        var colors = colorbrewer[colorscheme][segments];
+        legendData = _(colors).zip(mapDef.ordinals);
     }
-    // TODO handle ordinals
 
     d3.select("#map-title").text(mapDef.title);
 
-    var colors = colorbrewer[colorscheme][segments];
-
-    var legend = d3.select('#legend').append('ul').attr('class', 'list-inline');
-    var keys = legend.selectAll('li.key').data(colors);
+    var legend = d3.select('#legend');
+    legend.selectAll("ul").remove();
+    var list = legend.append('ul').attr('class', 'list-inline');
+    var keys = list.selectAll('li.key').data(legendData);
     keys.enter()
         .append('li')
         .attr('class', 'key')
-        .style('border-left-color', String)
+        .style('border-left-color', function (d) { return d[0] })
         .text(function (d) {
-            return d;
+            return d[1];
         });
 
     var countries = svg.selectAll("path.land");
@@ -238,6 +247,20 @@ function updateMap(mapId) {
 }
 
 function init() {
-    var initialMap = "treat_5";
+    console.log("hi")
+    var MapRouter = Backbone.Router.extend({
+        routes: {
+            "map/:mapName": "showMap"
+        },
+
+        showMap: function (mapName) {
+            updateMap(mapName);
+        }
+    });
+
+    var initialMap = "reported";
     updateMap(initialMap);
+
+    var router = new MapRouter();
+    Backbone.history.start();
 }

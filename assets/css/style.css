@@ -1,13 +1,13 @@
 .land {
   fill: #CCC;
   fill-opacity: 1;
-  stroke: #777;
+  stroke: #CCC;
   stroke-width: .5px;
 }
 
 .land:hover{
-  stroke: #666;
-  stroke-width: 1.5px;
+  stroke: #FFF;
+  stroke-width: 3px;
 }
 
 .list-inline {
@@ -30,7 +30,6 @@ li.key {
     border-left-width: 15px;
     border-left-style: solid;
     font-size: .75em;
-    width: 10%;
     padding-left: 10px;
     padding-right: 0;
     margin-right: 30px;

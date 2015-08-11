@@ -1,7 +1,7 @@
 # Makefile
 GITHUB_REPO ?= sentinel-project/sentinel-project.github.io
 
-dist:
+dist: clean
 	npm run build
 
 # Sends the documentation to gh-pages.

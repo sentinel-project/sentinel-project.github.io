@@ -190,22 +190,38 @@ function resize() {
 // Show initial map
 // =================
 
+function generateLogLegend(segments) {
+    return ["0-9", "10-99", "100-999", "1,000-9,999", "10,000+"];
+}
+
 function updateMap(mapId) {
     var mapDef = charts[mapId];
     var svg = d3.select("#world-map").select("svg");
-    var scale, segments, legendData;
+    var scale, segments, legendData, tooltipFn;
 
     if (mapDef.scale === "log") {
         scale = d3.scale.log();
         segments = mapDef.segments;
         var colors = colorbrewer[colorscheme][segments];
-        legendData = _(colors).zip(colors);
+        legendData = _(colors).zip(generateLogLegend());
+        tooltipFn = function () {
+            var data = dataMap.get(this.id);
+            if (data !== undefined) {
+                return "<h4>" + data.country + "</h4><div>" + d3.format(",d")(data[mapId]) + "</div>";
+            }
+        }
     } else {
         segments = mapDef.ordinals.length;
         scale = d3.scale.linear();
 
         var colors = colorbrewer[colorscheme][segments];
         legendData = _(colors).zip(mapDef.ordinals);
+        tooltipFn = function () {
+            var data = dataMap.get(this.id);
+            if (data !== undefined) {
+                return "<h4>" + data.country + "</h4><div>" + mapDef.ordinals[data[mapId]] + "</div>";
+            }
+        }
     }
 
     d3.select("#map-title").text(mapDef.title);
@@ -231,19 +247,17 @@ function updateMap(mapId) {
         return "q" + Math.min(segments - 1, Math.floor(scale(i))) + "-" + segments;
     }
 
-    countries.attr("class", function () {
-        if (dataMap.get(this.id) !== undefined) {
-            return "land " + colorClass(dataMap.get(this.id)[mapId]);
-        } else {
-            return "land no-data";
-        }
-    });
-
-    countries.attr("data-hover", function () {
-        if (dataMap.get(this.id) !== undefined) {
-            return dataMap.get(this.id)[mapId];
-        }
-    })
+    countries
+        .attr("class", function () {
+            if (dataMap.get(this.id) !== undefined) {
+                return "land " + colorClass(dataMap.get(this.id)[mapId]);
+            } else {
+                return "land no-data";
+            }
+        })
+        .attr("data-toggle", "tooltip")
+        .attr("data-placement", "top")
+        .attr("data-original-title", tooltipFn);
 }
 
 function init() {
@@ -257,6 +271,11 @@ function init() {
             updateMap(mapName);
         }
     });
+
+    $('svg path.land').tooltip({container: "#world-map",
+                                html: true,
+                                placement: "auto top",
+                                viewport: '#world-map'});
 
     var initialMap = "reported";
     updateMap(initialMap);

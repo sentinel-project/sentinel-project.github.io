@@ -1,13 +1,17 @@
+body {
+    font-family: "Open Sans", sans-serif;
+}
+
 .land {
   fill: #CCC;
   fill-opacity: 1;
-  stroke: #CCC;
+  stroke: #999;
   stroke-width: .5px;
 }
 
 .land:hover{
-  stroke: #FFF;
-  stroke-width: 3px;
+  stroke: #333;
+  stroke-width: 1.5px;
 }
 
 .list-inline {

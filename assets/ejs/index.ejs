@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <!-- Optional theme -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,400italic,700italic,700' rel='stylesheet' type='text/css'>,
     <link rel="stylesheet" href="css/style.css" media="screen" charset="utf-8">
     <link rel="stylesheet" href="css/colorbrewer.css" media="screen" charset="utf-8">
 </head>
@@ -15,11 +16,11 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-xs-12">
-                <h1>Data Visualizations for TB Across the Globe</h1>
+                <h2>Data Visualizations for TB Across the Globe</h2>
             </div>
         </div>
         <div class="row">
-            <div class="col-lg-4 col-md-5">
+            <div class="col-lg-4 col-sm-5">
                 <ul class="nav nav-tabs">
                     <li class="active"><a href="#map-the-gap" data-toggle="tab">Map the Gap</a></li>
                     <li><a href="#targets" data-toggle="tab">Targets</a></li>
@@ -53,8 +54,8 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-8 col-md-7">
-                <h2 id="map-title"></h2>
+            <div class="col-lg-8 col-sm-7">
+                <h3 id="map-title"></h3>
                 <div id="legend"></div>
                 <div id="world-map">
                     <% include world %>
@@ -64,6 +65,7 @@
     </div>
 
     <!-- Latest compiled and minified JavaScript -->
+    <script src="iframeResizer.contentWindow.min.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <% if (dev) { %>

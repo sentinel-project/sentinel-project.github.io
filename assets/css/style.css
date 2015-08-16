@@ -2,11 +2,15 @@ body {
     font-family: "Open Sans", sans-serif;
 }
 
+g {
+    stroke-width: 1px;
+}
+
 .land {
   fill: #CCC;
   fill-opacity: 1;
   stroke: #FFF;
-  stroke-width: 1px;
+  stroke-width: inherit;
 }
 
 .map .centered {

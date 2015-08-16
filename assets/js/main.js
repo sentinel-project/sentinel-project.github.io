@@ -270,35 +270,44 @@ function updateMap(mapId) {
 function zoom() {
     d3.event.stopPropagation();
 
-    var g = svg.select("g");
-    var scale;
-    console.log(this);
-
     if (this === centered || this === svg.node()) {
-        console.log("unzoom");
-        g.attr("transform", "");
-        d3.selectAll(".land").style("stroke-width", 1);
-        d3.select(centered).classed("centered", false);
-        centered = false;
+        uncenter();
     } else {
-        console.log("zoom");
-        var gbox = g.node().getBBox(),
-            bbox = this.getBBox(),
-            spacing = 20,
-            x = bbox.x - spacing,
-            y = bbox.y - spacing,
-            boxheight = bbox.height + (2 * spacing),
-            boxwidth = bbox.width + (2 * spacing),
-            dx = -x,
-            dy = -y,
-            scale = Math.min(gbox.height / boxheight, gbox.width / boxwidth);
-
-        g.attr("transform", "scale(" + scale + ")" + "translate(" + dx + "," + dy + ")");
-        d3.selectAll(".land").style("stroke-width", 1 / scale).classed("centered", false);
-        d3.select(this).classed("centered", true);
-
-        centered = this;
+        center(d3.select(this));
     }
+}
+
+function center(path) {
+    var g = svg.select("g"),
+        gbox = g.node().getBBox(),
+        bbox = path.node().getBBox(),
+        spacing = 20,
+        x = bbox.x - spacing,
+        y = bbox.y - spacing,
+        boxheight = bbox.height + (2 * spacing),
+        boxwidth = bbox.width + (2 * spacing),
+        gratio = gbox.width / gbox.height,
+        scale = Math.min(gbox.height / boxheight, gbox.width / boxwidth),
+        newheight = Math.max(boxheight, gratio / boxwidth),
+        newwidth = Math.max(boxwidth, gratio * boxheight),
+        dx = -x + (newwidth - boxwidth) / 2,
+        dy = -y + (newheight - boxheight) / 2;
+
+    g.transition().duration(750)
+      .attr("transform", "scale(" + scale + ")" + "translate(" + dx + "," + dy + ")")
+      .style("stroke-width", 1 / scale);
+    d3.selectAll(".land").classed("centered", false);
+    path.classed("centered", true);
+
+    centered = path.node();
+}
+
+function uncenter() {
+    var g = svg.select("g");
+
+    g.transition().duration(750).attr("transform", "").style("stroke-width", 1);
+    d3.select(centered).classed("centered", false);
+    centered = null;
 }
 
 function init() {

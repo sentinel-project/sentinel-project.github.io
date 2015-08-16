@@ -5,13 +5,12 @@ body {
 .land {
   fill: #CCC;
   fill-opacity: 1;
-  stroke: #999;
-  stroke-width: .5px;
+  stroke: #FFF;
+  stroke-width: 1px;
 }
 
-.land:hover{
-  stroke: #333;
-  stroke-width: 1.5px;
+.map .centered {
+    fill: #5fad9f;
 }
 
 .list-inline {
@@ -26,8 +25,15 @@ body {
     padding: 10px;
 }
 
-#legend {
+.legend {
     padding: 1.5em 0 0 1.5em;
+}
+
+.callout-title {
+    color: #5fad9f;
+    /*color: #660198;*/
+    /*color: rgb(33, 113, 181);*/
+    font-weight: 700;
 }
 
 li.key {
@@ -37,4 +43,10 @@ li.key {
     padding-left: 10px;
     padding-right: 0;
     margin-right: 30px;
+}
+
+a.active, a.active:hover {
+    color: black;
+    text-decoration: none;
+    font-weight: 700;
 }

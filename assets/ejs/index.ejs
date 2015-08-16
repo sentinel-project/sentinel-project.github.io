@@ -9,42 +9,42 @@
     <!-- Optional theme -->
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
     <link href='//fonts.googleapis.com/css?family=Open+Sans:400,400italic,700italic,700' rel='stylesheet' type='text/css'>,
-    <link rel="stylesheet" href="css/style.css" media="screen" charset="utf-8">
     <link rel="stylesheet" href="css/colorbrewer.css" media="screen" charset="utf-8">
+    <link rel="stylesheet" href="css/style.css" media="screen" charset="utf-8">    
 </head>
 <body>
     <div class="container-fluid">
         <div class="row">
             <div class="col-xs-12">
-                <h2>Data Visualizations for TB Across the Globe</h2>
+                <h2 class="callout-title">Data Visualizations for TB Across the Globe</h2>
             </div>
         </div>
         <div class="row">
             <div class="col-lg-4 col-sm-5">
                 <ul class="nav nav-tabs">
-                    <li class="active"><a href="#map-the-gap" data-toggle="tab">Map the Gap</a></li>
+                    <li><a href="#map-the-gap" data-toggle="tab">Map the Gap</a></li>
                     <li><a href="#targets" data-toggle="tab">Targets</a></li>
                     <li><a href="#members" data-toggle="tab">Project Members</a></li>
                 </ul>
                 <div class="tab-content map-list">
                     <div role="tabpanel" class="tab-pane active" id="map-the-gap">
                         <ul class="list-unstyled">
-                            <li><a href="#map/reported">Reported Cases</a></li>
-                            <li><a href="#map/pub_mdr">Publication Documenting MDR-TB Cases</a></li>
-                            <li><a href="#map/pub_xdr">Publication Documenting XDR-TB Cases</a></li>
-                            <li><a href="#map/all_mdr">All MDR-TB Data</a></li>
-                            <li><a href="#map/all_xdr">All XDR-TB Data</a></li>
+                            <li><a id="link-reported" href="#map/reported">Reported Cases</a></li>
+                            <li><a id="link-pub_mdr" href="#map/pub_mdr">Publication Documenting MDR-TB Cases</a></li>
+                            <li><a id="link-pub_xdr" href="#map/pub_xdr">Publication Documenting XDR-TB Cases</a></li>
+                            <li><a id="link-all_mdr" href="#map/all_mdr">All MDR-TB Data</a></li>
+                            <li><a id="link-all_xdr" href="#map/all_xdr">All XDR-TB Data</a></li>
                         </ul>
                     </div>
                     <div role="tabpanel" class="tab-pane" id="targets">
                         <ul class="list-unstyled">
-                            <li><a href="#map/estimated">Estimated MDR-TB Cases</a></li>
-                            <li><a href="#map/eval_0">0-4 Year Olds: Needing Evaluation</a></li>
-                            <li><a href="#map/eval_5">5-14 Year Olds: Needing Evaluation</a></li>
-                            <li><a href="#map/treat_0">0-4 Year Olds: Needing Treatment</a></li>
-                            <li><a href="#map/treat_5">5-14 Year Olds: Needing Treatment</a></li>
-                            <li><a href="#map/therapy_0">0-4 Year Olds: Needing Preventative Therapy</a></li>
-                            <li><a href="#map/therapy_5">5-14 Year Olds: Needing Preventative Therapy</a></li>
+                            <li><a id="link-estimated" href="#map/estimated">Estimated MDR-TB Cases</a></li>
+                            <li><a id="link-eval_0" href="#map/eval_0">0-4 Year Olds: Needing Evaluation</a></li>
+                            <li><a id="link-eval_5" href="#map/eval_5">5-14 Year Olds: Needing Evaluation</a></li>
+                            <li><a id="link-treat_0" href="#map/treat_0">0-4 Year Olds: Needing Treatment</a></li>
+                            <li><a id="link-treat_5" href="#map/treat_5">5-14 Year Olds: Needing Treatment</a></li>
+                            <li><a id="link-therapy_0" href="#map/therapy_0">0-4 Year Olds: Needing Preventative Therapy</a></li>
+                            <li><a id="link-therapy_5" href="#map/therapy_5">5-14 Year Olds: Needing Preventative Therapy</a></li>
                         </ul>
                     </div>
                     <div role="tabpanel" class="tab-pane" id="members">
@@ -56,8 +56,8 @@
             </div>
             <div class="col-lg-8 col-sm-7">
                 <h3 id="map-title"></h3>
-                <div id="legend"></div>
-                <div id="world-map">
+                <div id="legend" class="legend"></div>
+                <div id="world-map" class="map">
                     <% include world %>
                 </div>
             </div>

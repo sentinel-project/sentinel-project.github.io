@@ -7,12 +7,12 @@ var Backbone = require('backbone');
 var margin = {top: 10, left: 10, bottom: 10, right: 10}
 , width = parseInt(d3.select('#world-map').style('width'))
 , width = width - margin.left - margin.right
-, mapRatio = 651/1008
-, height = width * mapRatio;
+, mapRatio = 1008/651
+, height = width / mapRatio;
 
 var colorscheme = "Blues";
 
-var dataMap;
+var dataMap, centered;
 
 // =======================
 // Chart defs
@@ -103,7 +103,6 @@ queue()
         pubs.forEach(function (d) {
             data[d.id] = _.extend(data[d.id], d.data);
         });
-        console.log(data);
         dataMap = d3.map(data);
         init();
     });
@@ -170,7 +169,7 @@ function cleanPubCSV(data) {
 // Set up map to display and resize correctly
 // =============================================
 var worldMap = d3.select("#world-map");
-worldMap.attr('class', colorscheme);
+worldMap.classed(colorscheme, true);
 var svg = worldMap.select("svg");
 svg.attr('width', width).attr('height', height);
 d3.select(window).on('resize', resize);
@@ -180,7 +179,7 @@ function resize() {
     // adjust things when the window size changes
     width = parseInt(d3.select('#world-map').style('width'));
     width = width - margin.left - margin.right;
-    height = width * mapRatio;
+    height = width / mapRatio;
 
     svg.attr('width', width).attr('height', height);
 }
@@ -198,6 +197,14 @@ function updateMap(mapId) {
     var mapDef = charts[mapId];
     var svg = d3.select("#world-map").select("svg");
     var scale, segments, legendData, tooltipFn;
+
+    d3.selectAll(".map-list a").classed({"active": false});
+
+    // This is easier to do with jQuery.
+    var $mapLink = $("#link-" + mapId)
+    $mapLink.addClass('active');
+    var tabName = $mapLink.closest('.tab-pane').attr('id');
+    $("a[href='#" + tabName + "']").tab('show');
 
     if (mapDef.scale === "log") {
         scale = d3.scale.log();
@@ -228,11 +235,11 @@ function updateMap(mapId) {
 
     var legend = d3.select('#legend');
     legend.selectAll("ul").remove();
-    var list = legend.append('ul').attr('class', 'list-inline');
+    var list = legend.append('ul').classed('list-inline', true);
     var keys = list.selectAll('li.key').data(legendData);
     keys.enter()
         .append('li')
-        .attr('class', 'key')
+        .classed('key', true)
         .style('border-left-color', function (d) { return d[0] })
         .text(function (d) {
             return d[1];
@@ -260,8 +267,41 @@ function updateMap(mapId) {
         .attr("data-original-title", tooltipFn);
 }
 
+function zoom() {
+    d3.event.stopPropagation();
+
+    var g = svg.select("g");
+    var scale;
+    console.log(this);
+
+    if (this === centered || this === svg.node()) {
+        console.log("unzoom");
+        g.attr("transform", "");
+        d3.selectAll(".land").style("stroke-width", 1);
+        d3.select(centered).classed("centered", false);
+        centered = false;
+    } else {
+        console.log("zoom");
+        var gbox = g.node().getBBox(),
+            bbox = this.getBBox(),
+            spacing = 20,
+            x = bbox.x - spacing,
+            y = bbox.y - spacing,
+            boxheight = bbox.height + (2 * spacing),
+            boxwidth = bbox.width + (2 * spacing),
+            dx = -x,
+            dy = -y,
+            scale = Math.min(gbox.height / boxheight, gbox.width / boxwidth);
+
+        g.attr("transform", "scale(" + scale + ")" + "translate(" + dx + "," + dy + ")");
+        d3.selectAll(".land").style("stroke-width", 1 / scale).classed("centered", false);
+        d3.select(this).classed("centered", true);
+
+        centered = this;
+    }
+}
+
 function init() {
-    console.log("hi")
     var MapRouter = Backbone.Router.extend({
         routes: {
             "map/:mapName": "showMap"
@@ -279,6 +319,11 @@ function init() {
 
     var initialMap = "reported";
     updateMap(initialMap);
+
+    // Set up zooming
+    var g = svg.select("g");
+    svg.on("click", zoom);
+    g.selectAll("path.land").on("click", zoom);
 
     var router = new MapRouter();
     Backbone.history.start();

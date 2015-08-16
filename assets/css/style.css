@@ -29,8 +29,12 @@ g {
     padding: 10px;
 }
 
-.legend {
+.legend, #country-dropdown {
     padding: 1.5em 0 0 1.5em;
+}
+
+#country-dropdown {
+    text-align: right;
 }
 
 .callout-title {

@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
     <link href='//fonts.googleapis.com/css?family=Open+Sans:400,400italic,700italic,700' rel='stylesheet' type='text/css'>,
     <link rel="stylesheet" href="css/colorbrewer.css" media="screen" charset="utf-8">
-    <link rel="stylesheet" href="css/style.css" media="screen" charset="utf-8">    
+    <link rel="stylesheet" href="css/style.css" media="screen" charset="utf-8">
 </head>
 <body>
     <div class="container-fluid">
@@ -20,7 +20,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-lg-4 col-sm-5">
+            <div class="col-lg-4 col-sm-5" id="side-menu">
                 <ul class="nav nav-tabs">
                     <li><a href="#map-the-gap" data-toggle="tab">Map the Gap</a></li>
                     <li><a href="#targets" data-toggle="tab">Targets</a></li>
@@ -56,12 +56,21 @@
             </div>
             <div class="col-lg-8 col-sm-7">
                 <h3 id="map-title"></h3>
-                <div id="legend" class="legend"></div>
+                <div id="row">
+                    <div id="legend" class="legend col-sm-6"></div>
+                    <div id="country-dropdown" class="col-sm-5">
+                        <select name="country" id="country-select">
+
+                        </select>
+                    </div>
                 <div id="world-map" class="map">
                     <% include world %>
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class="well hidden" id="country-info" style="position: absolute; bottom: 0; left: 10px;">
     </div>
 
     <!-- Latest compiled and minified JavaScript -->

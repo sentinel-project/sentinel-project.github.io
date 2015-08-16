@@ -101,7 +101,7 @@ queue()
             data[d.id] = d.data;
         });
         pubs.forEach(function (d) {
-            data[d.id] = _.extend(data[d.id], d.data);
+            data[d.id] = _.extend(data[d.id] || {}, d.data);
         });
         dataMap = d3.map(data);
         init();
@@ -160,6 +160,8 @@ function cleanPubCSV(data) {
         d["all_xdr"] = d["reported_xdr"];
     }
 
+    d["country"] = data["Country/ territory"];
+
     return {id: data["Country code"],
             data: d}
 }
@@ -182,6 +184,7 @@ function resize() {
     height = width / mapRatio;
 
     svg.attr('width', width).attr('height', height);
+    $("#country-info").css("width", $("#side-menu").width());
 }
 
 
@@ -194,9 +197,10 @@ function generateLogLegend(segments) {
 }
 
 function updateMap(mapId) {
+    uncenter();
     var mapDef = charts[mapId];
     var svg = d3.select("#world-map").select("svg");
-    var scale, segments, legendData, tooltipFn;
+    var scale, segments, legendData, tooltipFn, infoFn;
 
     d3.selectAll(".map-list a").classed({"active": false});
 
@@ -206,15 +210,22 @@ function updateMap(mapId) {
     var tabName = $mapLink.closest('.tab-pane').attr('id');
     $("a[href='#" + tabName + "']").tab('show');
 
+    tooltipFn = function () {
+        var data = dataMap.get(this.id);
+        if (data !== undefined) {
+            return "<h4>" + data.country + "</h4>";
+        }
+    }
+
     if (mapDef.scale === "log") {
         scale = d3.scale.log();
         segments = mapDef.segments;
         var colors = colorbrewer[colorscheme][segments];
         legendData = _(colors).zip(generateLogLegend());
-        tooltipFn = function () {
+        infoFn = function () {
             var data = dataMap.get(this.id);
             if (data !== undefined) {
-                return "<h4>" + data.country + "</h4><div>" + d3.format(",d")(data[mapId]) + "</div>";
+                return "<div><strong>" + data.country + "</strong></div><div>" + d3.format(",d")(data[mapId]) + "</div>";
             }
         }
     } else {
@@ -223,10 +234,10 @@ function updateMap(mapId) {
 
         var colors = colorbrewer[colorscheme][segments];
         legendData = _(colors).zip(mapDef.ordinals);
-        tooltipFn = function () {
+        infoFn = function () {
             var data = dataMap.get(this.id);
             if (data !== undefined) {
-                return "<h4>" + data.country + "</h4><div>" + mapDef.ordinals[data[mapId]] + "</div>";
+                return "<div><strong>" + data.country + "</strong></div><div>" + mapDef.ordinals[data[mapId]] + "</div>";
             }
         }
     }
@@ -263,8 +274,8 @@ function updateMap(mapId) {
             }
         })
         .attr("data-toggle", "tooltip")
-        .attr("data-placement", "top")
-        .attr("data-original-title", tooltipFn);
+        .attr("data-original-title", tooltipFn)
+        .attr("data-info", infoFn);
 }
 
 function zoom() {
@@ -273,9 +284,12 @@ function zoom() {
     if (this === centered || this === svg.node()) {
         uncenter();
     } else {
-        center(d3.select(this));
+        var path = d3.select(this);
+        center(path);
     }
 }
+
+
 
 function center(path) {
     var g = svg.select("g"),
@@ -299,6 +313,10 @@ function center(path) {
     d3.selectAll(".land").classed("centered", false);
     path.classed("centered", true);
 
+    d3.select("#country-info")
+        .html(path.attr("data-info"))
+        .classed("hidden", false);
+
     centered = path.node();
 }
 
@@ -307,6 +325,8 @@ function uncenter() {
 
     g.transition().duration(750).attr("transform", "").style("stroke-width", 1);
     d3.select(centered).classed("centered", false);
+    d3.select("#country-info").html("").classed("hidden", true);
+    d3.select("#country-select").node().value = "---";
     centered = null;
 }
 
@@ -333,6 +353,36 @@ function init() {
     var g = svg.select("g");
     svg.on("click", zoom);
     g.selectAll("path.land").on("click", zoom);
+    resize();
+
+    var countries = _.filter(dataMap.keys(), function (cc) {
+        return !!d3.select("#" + cc).node()
+    });
+    countries = ["---"].concat(countries);
+    var countryOptions = _.zip(countries, _.map(countries, function (cc) {
+        if (dataMap.get(cc)) {
+            return dataMap.get(cc)["country"];
+        } else {
+            return cc;
+        }
+    }));
+    countryOptions = _.sortBy(countryOptions, function (d) {
+        return d[1];
+    })
+
+    d3.select("#country-select").selectAll("option").data(countryOptions)
+        .enter()
+        .append('option')
+        .attr("value", function (d) { return d[0]} )
+        .html(function (d) { return d[1] })
+
+    d3.select("#country-select").on("change", function () {
+        if (this.value === "---") {
+            uncenter();
+        } else {
+            center(d3.select("#" + this.value));
+        }
+    });
 
     var router = new MapRouter();
     Backbone.history.start();

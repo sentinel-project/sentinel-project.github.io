@@ -1,0 +1,60 @@
+body {
+    font-family: "Open Sans", sans-serif;
+}
+
+g {
+    stroke-width: 1px;
+}
+
+.land {
+  fill: #CCC;
+  fill-opacity: 1;
+  stroke: #FFF;
+  stroke-width: inherit;
+}
+
+.map .centered {
+    fill: #5fad9f;
+}
+
+.list-inline {
+  list-style: none;
+}
+
+.list-inline > li {
+  display: inline-block;
+}
+
+.map-list {
+    padding: 10px;
+}
+
+.legend, #country-dropdown {
+    padding: 1.5em 0 0 1.5em;
+}
+
+#country-dropdown {
+    text-align: right;
+}
+
+.callout-title {
+    color: #5fad9f;
+    /*color: #660198;*/
+    /*color: rgb(33, 113, 181);*/
+    font-weight: 700;
+}
+
+li.key {
+    border-left-width: 15px;
+    border-left-style: solid;
+    font-size: .75em;
+    padding-left: 10px;
+    padding-right: 0;
+    margin-right: 30px;
+}
+
+a.active, a.active:hover {
+    color: black;
+    text-decoration: none;
+    font-weight: 700;
+}
